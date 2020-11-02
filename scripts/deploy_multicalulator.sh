@@ -28,9 +28,7 @@ helm search repo -l $AZURE_CONTAINER_REGISTRY_NAME/multicalculator
 echo "Pulling kube-config for $AKS_NAME in $AKS_GROUP"
 az aks get-credentials --resource-group=$AKS_GROUP --name=$AKS_NAME
 
-echo "Ensuring kubernetes namespace $KUBERNETES_NAMESPACE"
-kubectl get namespace
-kubectl create namespace $KUBERNETES_NAMESPACE
+
 
 echo "Deploying helm release"
 helm upgrade calculator $AZURE_CONTAINER_REGISTRY_NAME/multicalculator --namespace $KUBERNETES_NAMESPACE --install --set replicaCount=4 --set image.frontendTag=$BUILD_BUILDNUMBER --set image.backendTag=$BUILD_BUILDNUMBER --set image.repository=$AZURE_CONTAINER_REGISTRY_URL --set dependencies.useAppInsights=true --set dependencies.appInsightsSecretValue=$APPINSIGHTS_KEY --set dependencies.useAzureRedis=true --set dependencies.redisHostValue=$REDIS_HOST --set dependencies.redisKeyValue=$REDIS_AUTH --set ingress.host=$INGRESS_FQDN --wait --timeout 45s
